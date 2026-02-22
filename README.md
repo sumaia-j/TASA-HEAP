@@ -16,3 +16,8 @@ sound effects from https://pixabay.com/sound-effects/search/scratch/
 type in terminal:
 
 python3 sound_effects.py
+
+
+
+Put into control mapping WearableTest-scripts.js and WearableTest_Trackpad_Scratch....xml in Mixxx.
+Then run scratch.py before using Mixxx. Use keyboard to control.
