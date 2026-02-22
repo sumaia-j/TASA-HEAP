@@ -59,18 +59,17 @@ void printControls() {
   Serial.println(F("\n--- Gesture Label Controls ---"));
   Serial.println(F("Send a character in Serial Monitor:"));
   Serial.println(F("  0 = NONE"));
-  Serial.println(F("  r = REST"));
+  Serial.println(F("  x = REST"));
   Serial.println(F("  u = UP"));
   Serial.println(F("  d = DOWN"));
   Serial.println(F("  f = FWD"));
   Serial.println(F("  b = BWD"));
   Serial.println(F("  l = LEFT"));
-  Serial.println(F("  ri = RIGHT"));
+  Serial.println(F("  r = RIGHT"));
   Serial.println(F("  c = CIRCLE"));
   Serial.println(F("  s = SCRATCH"));
   Serial.println(F("--------------------------------\n"));
 }
-
 
 void handleSerialLabel() {
   while (Serial.available()) {
@@ -80,7 +79,7 @@ void handleSerialLabel() {
 
     switch (ch) {
       case '0': currentLabel = LABEL_NONE; break;
-      //case 'r': currentLabel = LABEL_REST; break;
+      case 'x': currentLabel = LABEL_REST; break;
       case 'u': currentLabel = LABEL_UP; break;
       case 'd': currentLabel = LABEL_DOWN; break;
       case 'f': currentLabel = LABEL_FWD; break;
@@ -91,7 +90,6 @@ void handleSerialLabel() {
       case 's': currentLabel = LABEL_SCRATCH; break;
       default: break;
     }
-
 
     Serial.print(F("# LABEL="));
     Serial.println(labelToStr(currentLabel));

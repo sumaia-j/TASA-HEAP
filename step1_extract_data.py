@@ -16,12 +16,12 @@ import os
 
 PDF_FILES = [
     "rest.pdf",
-    "up.pdf",
-    "down.pdf",
-    "fwd.pdf",
-    "bwd.pdf",
-    "left.pdf",
-    "right.pdf",
+    "up_fast.pdf",
+    "down_fast.pdf",
+    "forward_fast.pdf",
+    "backward_fast.pdf",
+    "left_fast.pdf",
+    "right_fast.pdf",
 ]
 CSV_FILE = "gesture_data.csv"
 

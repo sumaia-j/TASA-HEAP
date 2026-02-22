@@ -20,9 +20,10 @@ from collections import deque
 PORT = "COM4"
 # ─────────────────────────────────────────────────────────────
 
-BAUD        = 115200
-MODEL_FILE  = "movement_model.pkl"
-CONFIDENCE  = 40
+BAUD            = 115200
+MODEL_FILE      = "movement_model.pkl"
+CONFIDENCE      = 50    # Only report if above 50% confident
+CONFIRM_COUNT   = 6     # Must see same label this many times in a row
 
 DISPLAY = {
     "REST":  "RESTING",
@@ -85,7 +86,7 @@ def extract_features(window):
 buffer          = deque(maxlen=WINDOW_SIZE)
 sample_count    = 0
 last_label      = None
-confirm_buffer  = deque(maxlen=5)  # Must see same label 5 times in a row
+confirm_buffer  = deque(maxlen=CONFIRM_COUNT)
 
 print("─" * 40)
 print("Move the sensor to see results!")
@@ -121,20 +122,27 @@ try:
             feats  = np.array([extract_features(window)])
 
             try:
-                pred   = clf.predict(feats)[0]
-                proba  = clf.predict_proba(feats)[0]
-                conf   = max(proba) * 100
+                pred  = clf.predict(feats)[0]
+                proba = clf.predict_proba(feats)[0]
+                conf  = max(proba) * 100
 
+                # Only add to confirm buffer if confidence is high enough
                 if conf >= CONFIDENCE:
                     confirm_buffer.append(pred)
                 else:
                     confirm_buffer.append(None)
 
-                # Only print if last 5 predictions all agree
-                if len(confirm_buffer) == 5 and len(set(confirm_buffer)) == 1 and pred != last_label:
+                # Only print if all recent predictions agree on the same label
+                # and the current confidence still meets the threshold
+                if (len(confirm_buffer) == CONFIRM_COUNT
+                        and len(set(confirm_buffer)) == 1
+                        and confirm_buffer[-1] is not None
+                        and conf >= CONFIDENCE
+                        and pred != last_label):
                     label_text = DISPLAY.get(pred, pred)
                     print(f"  {label_text}   ({conf:.0f}% confident)")
                     last_label = pred
+
             except Exception as e:
                 print(f"Prediction error: {e}")
                 break

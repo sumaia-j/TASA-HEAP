@@ -26,7 +26,7 @@ print("=" * 50)
 print("STEP 2: Training movement model...")
 print("=" * 50)
 
-# Delete old model if it exists
+# Always delete old model first
 if os.path.exists(MODEL_FILE):
     os.remove(MODEL_FILE)
     print("Deleted old model.")
@@ -94,6 +94,6 @@ with open(MODEL_FILE, "wb") as f:
         "n_features": X.shape[1]
     }, f)
 
-print(f"✅ Model saved to '{MODEL_FILE}'")
-print(f"✅ Features: {X.shape[1]}")
+print(f"\n✅ Model saved to '{MODEL_FILE}'")
+print(f"✅ Features per window: {X.shape[1]}")
 print("\nDone! Now run:  python step3_live_classify.py")
