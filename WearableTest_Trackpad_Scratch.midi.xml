@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='utf-8'?>
+<MixxxControllerPreset mixxxVersion="2.4" schemaVersion="1">
+    <info>
+        <n>WearableTest Trackpad Scratch</n>
+        <author>Your Team</author>
+        <description>IAC virtual MIDI -> scratch2 demo</description>
+    </info>
+    <controller id="wearabletest">
+        <scriptfiles>
+            <file filename="WearableTest-scripts.js" functionprefix="WearableTest"/>
+        </scriptfiles>
+        <controls>
+
+            <!-- Volume: CC7, mapped directly to Channel1 volume -->
+            <control>
+                <group>[Channel1]</group>
+                <key>volume</key>
+                <status>0xB0</status>
+                <midino>0x07</midino>
+                <options>
+                    <normal/>
+                </options>
+            </control>
+
+            <!-- Jog/Scratch tick: CC16, handled by JS script -->
+            <control>
+                <group>[Channel1]</group>
+                <key>WearableTest.jogTick</key>
+                <status>0xB0</status>
+                <midino>0x10</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+
+            <!-- Scratch enable: Note-On 60 (0x90), handled by JS script -->
+            <control>
+                <group>[Channel1]</group>
+                <key>WearableTest.scratchHold</key>
+                <status>0x90</status>
+                <midino>0x3C</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+
+            <!-- Scratch disable: Note-Off 60 (0x80), routed to same JS handler -->
+            <control>
+                <group>[Channel1]</group>
+                <key>WearableTest.scratchHold</key>
+                <status>0x80</status>
+                <midino>0x3C</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+
+            <!-- Keyboard key triggers sampler -->
+             <control>
+                 <group>[Sampler1]</group>
+                 <status>0x90</status>
+                 <midino>65</midino>
+                 <options>
+                     <script-binding/>
+                 </options>
+                 <key>WearableTest.playSample</key>
+             </control>
+
+        </controls>
+        <outputs/>
+    </controller>
+</MixxxControllerPreset>
