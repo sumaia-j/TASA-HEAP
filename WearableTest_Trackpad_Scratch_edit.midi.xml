@@ -63,29 +63,9 @@
                  <options>
                      <script-binding/>
                  </options>
-                 <key>WearableTest.playSample1</key>
+                 <key>WearableTest.playSample</key>
              </control>
-             
-             <control>
-                <group>[Sampler2]</group>
-                <status>0x90</status>
-                <midino>66</midino>
-                <options>
-                    <script-binding/>
-                </options>
-                <key>WearableTest.playSample2</key>
-            </control>
-            
-            <control>
-                <group>[Sampler3]</group>
-                <status>0x90</status>
-                <midino>67</midino>
-                <options>
-                    <script-binding/>
-                </options>
-                <key>WearableTest.playSample3</key>
-            </control>
-
+  
         </controls>
         <outputs/>
     </controller>

@@ -50,8 +50,12 @@ WearableTest.playSample2 = function (channel, control, value, status, group) {
     }
 };
 
-WearableTest.playSample3 = function (channel, control, value, status, group) {
+WearableTest.playSample = function (channel, control, value, status, group) {
     if (value > 0) {
-        engine.setValue("[Sampler3]", "start_play", 1);
+
+        // choose random sampler 1–4
+        var slot = Math.floor(Math.random() * 4) + 1;
+
+        engine.setValue("[Sampler" + slot + "]", "start_play", 1);
     }
 };

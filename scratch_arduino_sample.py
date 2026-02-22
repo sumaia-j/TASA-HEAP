@@ -29,9 +29,8 @@ JOG_CC        = 16
 SCRATCH_NOTE  = 60
 MIDI_CH       = 0
 # samples, might not use all of them
-SAMPLE_NOTE1 = 65
-SAMPLE_NOTE2 = 66
-SAMPLE_NOTE3 = 67
+SAMPLE_NOTES = [65, 66, 67, 68]
+SAMPLE_TRIGGER_NOTE = 65
 
 VOL_STEP      = 3
 JOG_TICK      = 6
@@ -92,14 +91,11 @@ def send_note_on():
 def send_note_off():
     midi.send_message([0x80 + MIDI_CH, SCRATCH_NOTE & 0x7F, 0])
 
-def send_sample(note):
-    midi.send_message([0x90 + MIDI_CH, note, 127])
-    midi.send_message([0x90 + MIDI_CH, note, 0])
-
 # sample helper
-def trigger_sample(note):
-    midi.send_message([0x90 + MIDI_CH, note, 127])
-    midi.send_message([0x90 + MIDI_CH, note, 0])
+def trigger_sample():
+    midi.send_message([0x90 + MIDI_CH, SAMPLE_TRIGGER_NOTE, 127])
+    midi.send_message([0x90 + MIDI_CH, SAMPLE_TRIGGER_NOTE, 0])
+
 
 def jog_loop():
     global jog_direction
@@ -150,16 +146,8 @@ def handle_gesture(label):
    # might not implement every one
    # replace label with appropiate motion
 
-    elif label == "SHAKE":
-        print("AIR HORN")
-        trigger_sample(SAMPLE_NOTE1)
-    elif label == "UP_FAST":
-        print("RISER")
-        trigger_sample(SAMPLE_NOTE2)
-    
-    elif label == "DOWN_FAST":
-        print("BASS DROP")
-        trigger_sample(SAMPLE_NOTE3)
+    elif label == "TWIST":   # or whatever your gesture is
+        trigger_sample()
 
 # ── Feature extraction ──
 def extract_features(window):
