@@ -13,22 +13,25 @@ from collections import deque
 
 # ─────────────────────────────────────────────────────────────
 #  *** CHANGE THESE TO MATCH YOUR SETUP ***
-SERIAL_PORT = "/dev/tty.usbserial-1120"   # your Arduino port
-MIDI_PORT_NAME = "WearableTest"            # your IAC bus name
+SERIAL_PORT = "/dev/tty.usbserial-1120"
+MIDI_PORT_NAME = "WearableTest"
 MODEL_FILE = "movement_model.pkl"
 # ─────────────────────────────────────────────────────────────
 
-BAUD        = 115200
-CONFIDENCE  = 40
+BAUD               = 115200
+CONFIDENCE_SCRATCH = 45   # left/right — slightly more lenient
+CONFIDENCE_VOL    = 50   # up/down — stricter
+CONFIRM_COUNT      = 5
+SILENCE_LIMIT      = 10
 
-VOL_CC      = 7
-JOG_CC      = 16
-SCRATCH_NOTE = 60
-MIDI_CH     = 0
+VOL_CC        = 7
+JOG_CC        = 16
+SCRATCH_NOTE  = 60
+MIDI_CH       = 0
 
-VOL_STEP    = 3
-JOG_TICK    = 6
-JOG_INTERVAL = 0.05  # seconds between jog ticks while gesture held
+VOL_STEP      = 3
+JOG_TICK      = 6
+JOG_INTERVAL  = 0.05
 
 # ── Load model ──
 print("=" * 50)
@@ -119,7 +122,7 @@ def handle_gesture(label):
         start_jog(-1)
     elif label == "RIGHT":
         start_jog(+1)
-    elif label == "REST":
+    elif label in ("REST", "NONE"):
         stop_jog()
     elif label == "UP":
         volume = clamp(volume + VOL_STEP, 0, 127)
@@ -129,9 +132,8 @@ def handle_gesture(label):
         volume = clamp(volume - VOL_STEP, 0, 127)
         send_cc(VOL_CC, volume)
         print(f"  VOL {volume}")
-    # FWD and BWD are ignored — extend here if needed
 
-# ── Feature extraction (must match step2 exactly) ──
+# ── Feature extraction ──
 def extract_features(window):
     features = []
     for col in range(window.shape[1]):
@@ -143,7 +145,8 @@ def extract_features(window):
 buffer         = deque(maxlen=WINDOW_SIZE)
 sample_count   = 0
 last_label     = None
-confirm_buffer = deque(maxlen=5)
+confirm_buffer = deque(maxlen=CONFIRM_COUNT)
+silence_count  = 0
 
 print("─" * 40)
 print("Move the sensor to control Mixxx!")
@@ -181,14 +184,29 @@ try:
             feats  = np.array([extract_features(window)])
 
             try:
-                pred = clf.predict(feats)[0]
+                pred  = clf.predict(feats)[0]
                 proba = clf.predict_proba(feats)[0]
                 conf  = max(proba) * 100
 
-                confirm_buffer.append(pred if conf >= CONFIDENCE else None)
+                threshold = CONFIDENCE_SCRATCH if pred in ("LEFT", "RIGHT") else CONFIDENCE_VOL
 
-                if (len(confirm_buffer) == 5
+                if conf >= threshold:
+                    silence_count = 0
+                    confirm_buffer.append(pred)
+                else:
+                    silence_count += 1
+                    confirm_buffer.append(None)
+                    if silence_count >= SILENCE_LIMIT:
+                        if last_label not in (None, "REST", "NONE"):
+                            print("  (no confident gesture — stopping)")
+                            stop_jog()
+                            last_label = "REST"
+                        silence_count = 0
+
+                if (len(confirm_buffer) == CONFIRM_COUNT
                         and len(set(confirm_buffer)) == 1
+                        and confirm_buffer[-1] is not None
+                        and conf >= threshold
                         and pred != last_label):
                     print(f"  {pred}  ({conf:.0f}%)")
                     handle_gesture(pred)
